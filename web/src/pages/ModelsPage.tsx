@@ -222,13 +222,16 @@ function UseAsMenu({
         disabled={busy}
         className="text-[10px] h-6 px-2"
         prefix={busy ? <Spinner /> : null}
+        aria-expanded={open}
+        aria-haspopup="menu"
       >
         Use as <ChevronDown className="h-3 w-3" />
       </Button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 min-w-[220px] border border-border bg-card shadow-lg">
+        <div role="menu" className="absolute right-0 top-full mt-1 z-50 min-w-[220px] border border-border bg-card shadow-lg">
           <button
             type="button"
+            role="menuitem"
             onClick={() => assign("main", "")}
             disabled={busy}
             className="flex w-full items-center justify-between px-3 py-2 text-xs hover:bg-muted/50 disabled:opacity-40"
@@ -250,6 +253,7 @@ function UseAsMenu({
 
           <button
             type="button"
+            role="menuitem"
             onClick={() => assign("auxiliary", "")}
             disabled={busy}
             className="flex w-full items-center justify-between px-3 py-1.5 text-xs hover:bg-muted/50 disabled:opacity-40"
@@ -261,6 +265,7 @@ function UseAsMenu({
             <button
               key={t.key}
               type="button"
+              role="menuitem"
               onClick={() => assign("auxiliary", t.key)}
               disabled={busy}
               className="flex w-full items-center justify-between px-3 py-1.5 text-xs hover:bg-muted/50 disabled:opacity-40"
