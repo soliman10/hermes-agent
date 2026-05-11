@@ -11,6 +11,9 @@ from pathlib import Path
 _profile_fallback_warned: bool = False
 
 
+_hermes_home_cache: Path | None = None
+_hermes_home_env_cache: object = object()  # Use object as unique sentinel
+
 def get_hermes_home() -> Path:
     """Return the Hermes home directory (default: ~/.hermes).
 
@@ -27,9 +30,16 @@ def get_hermes_home() -> Path:
     template in ``hermes_cli/gateway.py`` and the kanban dispatcher in
     ``hermes_cli/kanban_db.py``).  See https://github.com/NousResearch/hermes-agent/issues/18594.
     """
-    val = os.environ.get("HERMES_HOME", "").strip()
+    global _hermes_home_cache, _hermes_home_env_cache
+    env_val = os.environ.get("HERMES_HOME")
+    if env_val == _hermes_home_env_cache:
+        return _hermes_home_cache
+
+    val = (env_val or "").strip()
     if val:
-        return Path(val)
+        _hermes_home_env_cache = env_val
+        _hermes_home_cache = Path(val)
+        return _hermes_home_cache
 
     # Guard: if a non-default profile is sticky-active, warn once that
     # the fallback to the default profile is almost certainly wrong.
@@ -65,7 +75,9 @@ def get_hermes_home() -> Path:
             except Exception:
                 pass
 
-    return Path.home() / ".hermes"
+    _hermes_home_env_cache = env_val
+    _hermes_home_cache = Path.home() / ".hermes"
+    return _hermes_home_cache
 
 
 def get_default_hermes_root() -> Path:

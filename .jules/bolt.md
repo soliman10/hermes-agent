@@ -1,0 +1,3 @@
+## 2025-05-14 - [Performance Opt: Path Resolution & Caching]
+**Learning:** `get_tool_definitions` is a very hot path in the agent loop since it's called to check schemas. It originally called `get_config_path().stat()`, which triggered a deep dependency chain to parse paths and check environment variables (`get_hermes_home()`).
+**Action:** Implemented an `_hermes_home_env_cache` and `_hermes_home_cache` utilizing `object()` sentinel in `hermes_constants.py` to memoize the directory resolution, skipping overhead. In `model_tools.py` changed `pathlib.Path.stat()` to `os.stat()` to skip creating intermediate objects.
