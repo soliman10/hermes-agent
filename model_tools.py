@@ -298,8 +298,11 @@ def get_tool_definitions(
         try:
             from hermes_cli.config import get_config_path
             cfg_path = get_config_path()
-            cfg_stat = cfg_path.stat()
-            cfg_fp = (cfg_stat.st_mtime_ns, cfg_stat.st_size)
+            # Fast path: use os.stat on the string path instead of pathlib.Path.stat()
+            # to avoid the heavy object instantiation overhead
+            import os
+            st = os.stat(str(cfg_path))
+            cfg_fp = (st.st_mtime_ns, st.st_size)
         except (FileNotFoundError, OSError, ImportError):
             cfg_fp = None
         cache_key = (
